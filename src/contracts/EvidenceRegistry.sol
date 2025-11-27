@@ -48,7 +48,7 @@ contract EvidenceRegistry {
      */
     function submitEvidence(bytes32 _hash, string memory _metadata) public returns (uint256) {
         require(_hash != bytes32(0), "Hash cannot be empty");
-        require(hashToId[_hash] == 0, "Evidence with this hash already exists");
+        require(!evidenceRecords[hashToId[_hash]].exists, "Evidence with this hash already exists");
         
         evidenceCount++;
         uint256 newId = evidenceCount;

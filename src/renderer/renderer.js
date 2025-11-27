@@ -203,9 +203,12 @@ async function submitToBlockchain(hash, metadata) {
     
     // Simulate network delay
     setTimeout(() => {
-      // Generate a mock transaction hash
-      const txHash = '0x' + Array.from({length: 64}, () => 
-        Math.floor(Math.random() * 16).toString(16)
+      // Generate a mock transaction hash (development only - real implementation uses Web3)
+      // Use crypto-based random for better uniqueness
+      const randomBytes = new Uint8Array(32);
+      crypto.getRandomValues(randomBytes);
+      const txHash = '0x' + Array.from(randomBytes, byte => 
+        byte.toString(16).padStart(2, '0')
       ).join('');
       resolve(txHash);
     }, 2000);
