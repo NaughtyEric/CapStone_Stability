@@ -23,11 +23,14 @@
     <!-- Submit Evidence Tab -->
     <section id="submit-tab" class="tab-content active">
       <div class="card">
-        <h2>📷 Upload Image</h2>
-        <div class="upload-area" id="upload-area">
-          <div class="upload-icon">📁</div>
-          <p>Click to select an image</p>
-          <p class="file-types">Supported: JPG, PNG, GIF, BMP, WebP</p>
+        <h2>📷 Upload Image / Take ScreenShot</h2>
+        <div style="align-items: center; justify-content: center; display: flex; flex-direction: column; gap: 20px;">
+          <div class="upload-area" id="upload-area">
+            <div class="upload-icon">📁</div>
+            <p>Click to select an image</p>
+            <p class="file-types">Supported: JPG, PNG, GIF, BMP, WebP</p>
+          </div>
+          <button id="screenshot-btn" class="btn btn-secondary">...or take a screenshot.</button>
         </div>
         
         <div id="image-preview" class="image-preview hidden">

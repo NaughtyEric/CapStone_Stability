@@ -10,6 +10,7 @@ const contractAddress = document.getElementById('contract-address');
 const walletAddress = document.getElementById('wallet-address');
 const privateKey = document.getElementById('private-key');
 const submitBtn = document.getElementById('submit-btn');
+const screenshotBtn = document.getElementById('screenshot-btn');
 const saveLocalBtn = document.getElementById('save-local-btn');
 const submissionStatus = document.getElementById('submission-status');
 const recordsList = document.getElementById('records-list');
@@ -91,7 +92,17 @@ function displayImage(imageData) {
 
 // Update timestamp display
 function updateTimestamp() {
-  timestampValue.textContent = new Date().toISOString();
+  var now = new Date();
+  // “YYYY-MM-DD HH:MM:SS (UTC+x)” format
+  var formatted = now.getFullYear() + '-' +
+                  String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                  String(now.getDate()).padStart(2, '0') + ' ' +
+                  String(now.getHours()).padStart(2, '0') + ':' +
+                  String(now.getMinutes()).padStart(2, '0') + ':' +
+                  String(now.getSeconds()).padStart(2, '0') + 
+                  ' (UTC' + (now.getTimezoneOffset() > 0 ? '-' : '+') +
+                  String(Math.abs(now.getTimezoneOffset() / 60)).padStart(1, '0') + ')';
+  timestampValue.textContent = formatted;
 }
 
 // Enable/Disable buttons
@@ -104,6 +115,22 @@ function disableButtons() {
   submitBtn.disabled = true;
   saveLocalBtn.disabled = true;
 }
+
+screenshotBtn.addEventListener('click', async () => {
+  try {
+    const result = await window.electronAPI.takeScreenshot();
+    
+    if (result) {
+      currentImage = result;
+      displayImage(result);
+      updateTimestamp();
+      enableButtons();
+    }
+  } catch (error) {
+    console.error('Error taking screenshot:', error);
+    showStatus(submissionStatus, 'error', 'Failed to take screenshot: ' + error.message);
+  }
+});
 
 // Submit to Blockchain
 submitBtn.addEventListener('click', async () => {
