@@ -410,22 +410,47 @@ saveAbiBtn.addEventListener('click', () => {
 
 // Test connection button
 testConnectionBtn.addEventListener('click', async () => {
-  const url = rpcUrl.value.trim();
-  if (!url) {
-    showStatus(connectionStatus, 'error', '❌ Please enter an RPC URL');
-    return;
-  }
-  
-  showStatus(connectionStatus, 'info', '🔄 Testing connection...');
-  
-  // In production, this would make an actual RPC call
-  setTimeout(() => {
-    if (url.includes('infura') || url.includes('alchemy') || url.includes('localhost')) {
-      showStatus(connectionStatus, 'success', '✅ Connection successful!');
-    } else {
-      showStatus(connectionStatus, 'error', '❌ Could not connect to RPC endpoint');
+  testConnectionBtn.disabled = true;
+  showStatus(connectionStatus, 'info', '⏳ Testing connection...');
+  try {
+    const url = rpcUrl.value.trim();
+    if (!url) {
+      throw new Error('RPC URL is empty');
     }
-  }, 1000);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_chainId',
+        params: []
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.error) {
+      throw new Error(data.error.message || 'RPC error');
+    }
+
+    if (typeof data.result === 'string' && data.result.startsWith('0x')) {
+      const parsedChainId = parseInt(data.result, 16);
+      if (!Number.isNaN(parsedChainId)) {
+        chainId.value = parsedChainId;
+      }
+    }
+
+    showStatus(connectionStatus, 'success', '✅ Connection successful!');
+  } catch (error) {
+    showStatus(connectionStatus, 'error', '❌ Connection failed: ' + error.message);
+  } finally {
+    testConnectionBtn.disabled = false;
+  }
 });
 
 // Network selector updates chain ID

@@ -50,3 +50,5 @@ coverage/
 
 # Temporary files
 __tests__/test-files/
+
+/chain/ignition/deployments/

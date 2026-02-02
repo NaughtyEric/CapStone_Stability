@@ -61,6 +61,9 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+  
+  // Open DevTools automatically for debugging
+  mainWindow.webContents.openDevTools();
 }
 
 // IPC Handlers
