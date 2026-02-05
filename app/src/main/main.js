@@ -2,39 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
-
-// Store path for evidence records
-const getStorePath = () => {
-  const userDataPath = app.getPath('userData');
-  return path.join(userDataPath, 'evidence-records.json');
-};
-
-// Load evidence records from local storage
-function loadRecords() {
-  try {
-    const storePath = getStorePath();
-    if (fs.existsSync(storePath)) {
-      const data = fs.readFileSync(storePath, 'utf8');
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error('Error loading records:', error);
-  }
-  return [];
-}
-
-// Save evidence records to local storage
-function saveRecords(records) {
-  try {
-    const storePath = getStorePath();
-    fs.writeFileSync(storePath, JSON.stringify(records, null, 2));
-    return true;
-  } catch (error) {
-    console.error('Error saving records:', error);
-    return false;
-  }
-}
+const recordsManager = require('../modules/recordsManager');
 
 // Generate SHA-256 hash of a file
 function generateFileHash(filePath) {
@@ -94,58 +62,19 @@ ipcMain.handle('select-image', async () => {
 });
 
 ipcMain.handle('submit-evidence', async (event, { hash, metadata, transactionId, imagePath, base64Image }) => {
-  const timestamp = new Date().toISOString();
-  const records = loadRecords();
-  
-  const newRecord = {
-    id: uuidv4(),
-    hash: hash,
-    timestamp: timestamp,
-    metadata: metadata || '',
-    transactionId: transactionId || 'pending',
-    imagePath: imagePath,
-    base64Image: base64Image,
-    status: transactionId ? 'confirmed' : 'pending'
-  };
-  
-  records.push(newRecord);
-  
-  if (saveRecords(records)) {
-    return { success: true, record: newRecord };
-  }
-  
-  return { success: false, error: 'Failed to save record' };
+  return recordsManager.addRecord(hash, metadata, transactionId, imagePath, base64Image);
 });
 
 ipcMain.handle('get-records', async () => {
-  return loadRecords();
+  return recordsManager.loadRecords();
 });
 
 ipcMain.handle('delete-record', async (event, recordId) => {
-  const records = loadRecords();
-  const filteredRecords = records.filter(r => r.id !== recordId);
-  
-  if (saveRecords(filteredRecords)) {
-    return { success: true };
-  }
-  
-  return { success: false, error: 'Failed to delete record' };
+  return recordsManager.deleteRecord(recordId);
 });
 
 ipcMain.handle('update-transaction-id', async (event, { recordId, transactionId }) => {
-  const records = loadRecords();
-  const record = records.find(r => r.id === recordId);
-  
-  if (record) {
-    record.transactionId = transactionId;
-    record.status = 'confirmed';
-    
-    if (saveRecords(records)) {
-      return { success: true, record: record };
-    }
-  }
-  
-  return { success: false, error: 'Failed to update record' };
+  return recordsManager.updateTransactionId(recordId, transactionId);
 });
 
 // App lifecycle
