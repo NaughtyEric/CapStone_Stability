@@ -3,6 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 const recordsManager = require('../modules/recordsManager');
+const submitManager = require('../modules/submitManager');
 
 // Generate SHA-256 hash of a file
 function generateFileHash(filePath) {
@@ -31,7 +32,7 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
   
   // Open DevTools automatically for debugging
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 }
 
 // IPC Handlers
@@ -75,6 +76,15 @@ ipcMain.handle('delete-record', async (event, recordId) => {
 
 ipcMain.handle('update-transaction-id', async (event, { recordId, transactionId }) => {
   return recordsManager.updateTransactionId(recordId, transactionId);
+});
+
+ipcMain.handle('submit-to-chain', async (event, data) => {
+  try {
+    const result = await submitManager.submitEvidenceOnChain(data);
+    return { success: true, result };
+  } catch (error) {
+    return { success: false, error: error.message || 'Submit failed' };
+  }
 });
 
 // App lifecycle

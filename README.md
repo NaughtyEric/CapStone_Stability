@@ -72,6 +72,8 @@ function verifyHash(bytes32 hash) public view returns (bool exists, uint256 evid
 
 ## Project Structure (Current Design)
 
+Note: Outdated. Please refer to the actual project structure in the repository for the latest organization.
+
 ```
 ├── src/
 │   ├── main/

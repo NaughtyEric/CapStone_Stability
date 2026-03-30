@@ -30,7 +30,7 @@
             <p>Click to select an image</p>
             <p class="file-types">Supported: JPG, PNG, GIF, BMP, WebP</p>
           </div>
-          <button id="screenshot-btn" class="btn btn-secondary">...or take a screenshot.</button>
+          <!-- <button id="screenshot-btn" class="btn btn-secondary">...or take a screenshot.</button> -->
         </div>
         
         <div id="image-preview" class="image-preview hidden">
@@ -60,14 +60,18 @@
         <h2>⛓️ Blockchain Submission</h2>
         <div class="form-group">
           <label for="contract-address">Smart Contract Address:</label>
-          <input type="text" id="contract-address" placeholder="0x..." value="">
+          <input type="text" id="contract-address" placeholder="0x..." value="" spellcheck="false">
         </div>
         <div class="form-group">
           <label for="wallet-address">Your Wallet Address:</label>
-          <input type="text" id="wallet-address" placeholder="0x..." value="">
+          <input type="text" id="wallet-address" placeholder="0x..." value="" spellcheck="false">
         </div>
         <div class="form-group">
-          <label for="private-key">Private Key (for signing):</label>
+          <label for="sign-address">Sign Address (optional):</label>
+          <input type="text" id="sign-address" placeholder="Leave empty to use wallet address" value="" spellcheck="false">
+        </div>
+        <div class="form-group">
+          <label for="private-key">Private Key:</label>
           <input type="password" id="private-key" placeholder="Enter your private key">
           <small class="warning">⚠️ Never share your private key. Only stored locally.</small>
         </div>

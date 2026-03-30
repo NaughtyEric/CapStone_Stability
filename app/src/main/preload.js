@@ -10,5 +10,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Record management
   getRecords: () => ipcRenderer.invoke('get-records'),
   deleteRecord: (recordId) => ipcRenderer.invoke('delete-record', recordId),
-  updateTransactionId: (data) => ipcRenderer.invoke('update-transaction-id', data)
+  updateTransactionId: (data) => ipcRenderer.invoke('update-transaction-id', data),
+
+  // Blockchain submission
+  submitToChain: (data) => ipcRenderer.invoke('submit-to-chain', data)
 });
