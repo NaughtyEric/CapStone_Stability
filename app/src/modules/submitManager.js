@@ -1,6 +1,10 @@
 const { Web3 } = require('web3');
 
-// Add 0x prefix if missing
+/**
+ * Normalize a private key by ensuring a 0x prefix.
+ * @param {string} privateKey - Hex-encoded private key.
+ * @returns {string} Normalized private key with 0x prefix.
+ */
 function normalizePrivateKey(privateKey) {
 	if (!privateKey) {
 		throw new Error('Private key is required');
@@ -8,11 +12,20 @@ function normalizePrivateKey(privateKey) {
 	return privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`;
 }
 
-// test if this key is a valid 32-byte hex string
+/**
+ * Test if a private key is a valid 32-byte hex string.
+ * @param {string} privateKey - Hex-encoded private key.
+ * @returns {boolean} True if the key is valid.
+ */
 function isValidPrivateKey(privateKey) {
 	return /^0x[0-9a-fA-F]{64}$/.test(privateKey);
 }
 
+/**
+ * Normalize a SHA-256 hash by ensuring a 0x prefix.
+ * @param {string} hash - Hex-encoded SHA-256 hash.
+ * @returns {string} Normalized hash with 0x prefix.
+ */
 function normalizeHash(hash) {
 	if (!hash) {
 		throw new Error('Hash is required');
@@ -24,14 +37,29 @@ function normalizeHash(hash) {
 	return normalized;
 }
 
+/**
+ * Normalize an address string by trimming whitespace.
+ * @param {string} address - Address string.
+ * @returns {string} Trimmed address string.
+ */
 function normalizeAddress(address) {
 	return address ? address.trim() : '';
 }
 
+/**
+ * Test if an address is a valid 20-byte hex string.
+ * @param {string} address - Address string.
+ * @returns {boolean} True if the address is valid.
+ */
 function isValidAddress(address) {
 	return /^0x[0-9a-fA-F]{40}$/.test(address);
 }
 
+/**
+ * Resolve the correct submitEvidence method from the ABI.
+ * @param {object} contract - Web3 contract instance.
+ * @returns {{ type: string, method: Function } | null} Method descriptor or null.
+ */
 function getSubmitMethod(contract) {
 	const candidates = contract.options.jsonInterface.filter(item => {
 		return item.type === 'function' && item.name === 'submitEvidence';
@@ -54,6 +82,20 @@ function getSubmitMethod(contract) {
 	return null;
 }
 
+/**
+ * Submit evidence to the blockchain contract.
+ * @param {object} params - Submission parameters.
+ * @param {string} params.rpcUrl - RPC endpoint URL.
+ * @param {number} [params.chainId] - Expected chain ID.
+ * @param {string} params.contractAddress - Deployed contract address.
+ * @param {Array|object|string} params.contractAbi - Contract ABI (array or JSON).
+ * @param {string} [params.walletAddress] - Wallet address for validation.
+ * @param {string} params.privateKey - Private key for signing transactions.
+ * @param {string} params.hash - Evidence hash (hex string).
+ * @param {string} [params.metadata] - Optional metadata.
+ * @param {number} [params.timestamp] - Optional timestamp (seconds).
+ * @returns {Promise<{transactionHash: string, blockNumber: number, gasUsed: number, chainId: number}>}
+ */
 async function submitEvidenceOnChain({
 	rpcUrl,
 	chainId,
