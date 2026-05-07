@@ -4,8 +4,16 @@ import { escapeHtml, showStatus } from '../ui/status.js';
 import { submitToBlockchain } from '../services/blockchain.js';
 import { parseTimestampToUnix } from '../utils/time.js';
 
+let skipDeleteConfirm = false;
+let deleteModal = null;
+let deleteConfirmBtn = null;
+let deleteCancelBtn = null;
+let deleteSkipCheckbox = null;
+let deleteResolve = null;
+
 export function initRecords() {
   dom.refreshRecordsBtn.addEventListener('click', loadRecords);
+  initDeleteConfirmModal();
 }
 
 export async function loadRecords() {
@@ -83,11 +91,14 @@ function attachRecordEventListeners() {
 
   document.querySelectorAll('.delete-record').forEach(btn => {
     btn.addEventListener('click', async () => {
-      if (confirm('Are you sure you want to delete this record?')) {
-        const result = await window.electronAPI.deleteRecord(btn.dataset.id);
-        if (result.success) {
-          loadRecords();
-        }
+      const confirmed = await confirmDeleteRecord();
+      if (!confirmed) {
+        return;
+      }
+
+      const result = await window.electronAPI.deleteRecord(btn.dataset.id);
+      if (result.success) {
+        loadRecords();
       }
     });
   });
@@ -134,4 +145,55 @@ function attachRecordEventListeners() {
       }
     });
   });
+}
+
+function initDeleteConfirmModal() {
+  deleteModal = document.getElementById('delete-confirm-modal');
+  deleteConfirmBtn = document.getElementById('confirm-delete-btn');
+  deleteCancelBtn = document.getElementById('cancel-delete-btn');
+  deleteSkipCheckbox = document.getElementById('delete-confirm-skip');
+
+  if (!deleteModal || !deleteConfirmBtn || !deleteCancelBtn || !deleteSkipCheckbox) {
+    return;
+  }
+
+  deleteConfirmBtn.addEventListener('click', () => {
+    if (deleteSkipCheckbox.checked) {
+      skipDeleteConfirm = true;
+    }
+    resolveDeleteConfirm(true);
+  });
+
+  deleteCancelBtn.addEventListener('click', () => {
+    resolveDeleteConfirm(false);
+  });
+
+  deleteModal.addEventListener('click', (event) => {
+    if (event.target === deleteModal) {
+      resolveDeleteConfirm(false);
+    }
+  });
+}
+
+function confirmDeleteRecord() {
+  if (skipDeleteConfirm || !deleteModal) {
+    return Promise.resolve(true);
+  }
+
+  return new Promise(resolve => {
+    deleteResolve = resolve;
+    deleteSkipCheckbox.checked = false;
+    deleteModal.classList.remove('hidden');
+  });
+}
+
+function resolveDeleteConfirm(confirmed) {
+  if (!deleteResolve) {
+    return;
+  }
+
+  const resolve = deleteResolve;
+  deleteResolve = null;
+  deleteModal.classList.add('hidden');
+  resolve(confirmed);
 }
