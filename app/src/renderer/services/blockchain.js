@@ -53,3 +53,40 @@ export async function submitToBlockchain({ hash, metadata, signerAddress, timest
 
   return result.result.transactionHash;
 }
+
+export async function verifyOnChain({ hash }) {
+  const rpc = dom.rpcUrl.value.trim();
+  const contract = dom.contractAddress.value.trim();
+  const abiText = dom.contractAbi.value.trim();
+
+  if (!rpc) {
+    throw new Error('RPC URL is empty');
+  }
+  if (!contract) {
+    throw new Error('Contract address is empty');
+  }
+  if (!abiText) {
+    throw new Error('Contract ABI is empty');
+  }
+
+  let parsedAbi;
+  try {
+    parsedAbi = JSON.parse(abiText);
+  } catch (error) {
+    throw new Error('Invalid ABI JSON');
+  }
+
+  const result = await window.electronAPI.verifyOnChain({
+    rpcUrl: rpc,
+    chainId: parseInt(dom.chainId.value, 10) || undefined,
+    contractAddress: contract,
+    contractAbi: parsedAbi,
+    hash
+  });
+
+  if (!result.success) {
+    throw new Error(result.error || 'Verification failed');
+  }
+
+  return result.result;
+}

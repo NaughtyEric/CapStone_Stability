@@ -33,13 +33,6 @@ contract EvidenceRegistry {
         uint256 timestamp,
         string metadata
     );
-    
-    event EvidenceVerified(
-        uint256 indexed evidenceId,
-        bytes32 indexed hash,
-        bool verified
-    );
-    
     /**
      * @dev Submit new evidence to the blockchain
      * @param _hash SHA-256 hash of the evidence (as bytes32)

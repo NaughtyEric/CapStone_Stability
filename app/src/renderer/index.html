@@ -16,6 +16,7 @@
 
     <nav class="tabs">
       <button class="tab-btn active" data-tab="submit">Submit Evidence</button>
+      <button class="tab-btn" data-tab="verify">Verify Evidence</button>
       <button class="tab-btn" data-tab="records">View My Records</button>
       <button class="tab-btn" data-tab="settings">Blockchain Settings</button>
     </nav>
@@ -24,13 +25,13 @@
     <section id="submit-tab" class="tab-content active">
       <div class="card">
         <h2>📷 Upload Image / Take ScreenShot</h2>
-        <div style="align-items: center; justify-content: center; display: flex; flex-direction: column; gap: 20px;">
+        <div id="upload-actions" class="upload-actions" style="align-items: center; justify-content: center; display: flex; flex-direction: column; gap: 20px;">
           <div class="upload-area" id="upload-area">
             <div class="upload-icon">📁</div>
             <p>Click to select an image</p>
             <p class="file-types">Supported: JPG, PNG, GIF, BMP, WebP</p>
           </div>
-          <!-- <button id="screenshot-btn" class="btn btn-secondary">...or take a screenshot.</button> -->
+          <button id="screenshot-btn" class="btn btn-secondary">...or to take a screen shot</button>
         </div>
         
         <div id="image-preview" class="image-preview hidden">
@@ -82,6 +83,38 @@
         </div>
         
         <div id="submission-status" class="status-message hidden"></div>
+      </div>
+    </section>
+
+    <!-- Verify Evidence Tab -->
+    <section id="verify-tab" class="tab-content hidden">
+      <div class="card">
+        <h2>Verify Evidence</h2>
+        <div style="align-items: center; justify-content: center; display: flex; flex-direction: column; gap: 20px;">
+          <div class="upload-area" id="verify-upload-area">
+            <div class="upload-icon">📁</div>
+            <p>Click to select an image</p>
+            <p class="file-types">Supported: JPG, PNG, GIF, BMP, WebP</p>
+          </div>
+        </div>
+
+        <div id="verify-image-preview" class="image-preview hidden">
+          <img id="verify-preview-img" src="" alt="Selected image">
+          <button id="verify-clear-image" class="btn btn-secondary">✕ Clear</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>On-chain Verification</h2>
+        <div class="hash-display">
+          <label>SHA-256 Hash:</label>
+          <div class="hash-value" id="verify-hash-value">No image selected</div>
+        </div>
+        <div class="button-group">
+          <button id="verify-btn" class="btn btn-primary" disabled>Verify Evidence</button>
+        </div>
+        <div id="verify-status" class="status-message hidden"></div>
+        <div id="verify-details" class="record-details hidden"></div>
       </div>
     </section>
 

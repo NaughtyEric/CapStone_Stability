@@ -82,6 +82,29 @@ function getSubmitMethod(contract) {
 	return null;
 }
 
+function getVerifyMethod(contract) {
+	const candidates = contract.options.jsonInterface.filter(item => {
+		return item.type === 'function' && item.name === 'verifyHash';
+	});
+
+	if (candidates.length === 0) {
+		return null;
+	}
+
+	const oneArg = candidates.find(item => item.inputs && item.inputs.length === 1);
+	if (oneArg) {
+		return contract.methods.verifyHash;
+	}
+
+	return null;
+}
+
+function hasGetEvidence(contract) {
+	return contract.options.jsonInterface.some(item => {
+		return item.type === 'function' && item.name === 'getEvidence' && item.inputs && item.inputs.length === 1;
+	});
+}
+
 /**
  * Submit evidence to the blockchain contract.
  * @param {object} params - Submission parameters.
@@ -186,6 +209,82 @@ async function submitEvidenceOnChain({
 	};
 }
 
+/**
+ * Verify evidence existence on-chain and return evidence details when available.
+ * @param {object} params - Verification parameters.
+ * @param {string} params.rpcUrl - RPC endpoint URL.
+ * @param {number} [params.chainId] - Expected chain ID.
+ * @param {string} params.contractAddress - Deployed contract address.
+ * @param {Array|object|string} params.contractAbi - Contract ABI (array or JSON).
+ * @param {string} params.hash - Evidence hash (hex string).
+ * @returns {Promise<{exists: boolean, evidenceId: string, evidence?: {hash: string, timestamp: string, metadata: string, submitter: string}}>} 
+ */
+async function verifyEvidenceOnChain({
+	rpcUrl,
+	chainId,
+	contractAddress,
+	contractAbi,
+	hash
+}) {
+	if (!rpcUrl) {
+		throw new Error('RPC URL is required');
+	}
+	if (!contractAddress || !contractAddress.startsWith('0x') || contractAddress.length !== 42) {
+		throw new Error('Invalid contract address');
+	}
+
+	const normalizedHash = normalizeHash(hash);
+	if (!normalizedHash) {
+		throw new Error('Invalid hash format');
+	}
+
+	let parsedAbi;
+	try {
+		parsedAbi = typeof contractAbi === 'string' ? JSON.parse(contractAbi) : contractAbi;
+	} catch (error) {
+		throw new Error('Invalid contract ABI');
+	}
+
+	if (!Array.isArray(parsedAbi)) {
+		throw new Error('Contract ABI must be an array');
+	}
+
+	const web3 = new Web3(rpcUrl);
+	const actualChainId = await web3.eth.getChainId();
+	if (chainId && Number(chainId) !== Number(actualChainId)) {
+		throw new Error(`Chain ID mismatch. RPC is ${actualChainId}`);
+	}
+
+	const contract = new web3.eth.Contract(parsedAbi, contractAddress);
+	const verifyMethod = getVerifyMethod(contract);
+	if (!verifyMethod) {
+		throw new Error('verifyHash method not found in ABI');
+	}
+
+	const verifyResult = await verifyMethod(normalizedHash).call();
+	const exists = Boolean(verifyResult.exists ?? verifyResult[0]);
+	const evidenceId = String(verifyResult.evidenceId ?? verifyResult[1] ?? '0');
+
+	if (!exists || !hasGetEvidence(contract)) {
+		return { exists, evidenceId };
+	}
+
+	const evidenceResult = await contract.methods.getEvidence(evidenceId).call();
+	const evidence = {
+		hash: evidenceResult.hash ?? evidenceResult[0],
+		timestamp: String(evidenceResult.timestamp ?? evidenceResult[1]),
+		metadata: evidenceResult.metadata ?? evidenceResult[2],
+		submitter: evidenceResult.submitter ?? evidenceResult[3]
+	};
+
+	return {
+		exists,
+		evidenceId,
+		evidence
+	};
+}
+
 module.exports = {
-	submitEvidenceOnChain
+	submitEvidenceOnChain,
+	verifyEvidenceOnChain
 };

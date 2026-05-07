@@ -23,7 +23,7 @@ export function initImageSelection() {
   dom.clearImageBtn.addEventListener('click', () => {
     setCurrentImage(null);
     dom.imagePreview.classList.add('hidden');
-    dom.uploadArea.style.display = 'block';
+    dom.uploadActions.style.display = 'flex';
     dom.hashValue.textContent = 'No image selected';
     dom.timestampValue.textContent = '-';
     disableButtons();
@@ -37,7 +37,7 @@ export function updateTimestampDisplay() {
 export function resetForm() {
   setCurrentImage(null);
   dom.imagePreview.classList.add('hidden');
-  dom.uploadArea.style.display = 'block';
+  dom.uploadActions.style.display = 'flex';
   dom.hashValue.textContent = 'No image selected';
   dom.timestampValue.textContent = '-';
   dom.metadataInput.value = '';
@@ -57,6 +57,6 @@ export function disableButtons() {
 function displayImage(imageData) {
   dom.previewImg.src = imageData.base64;
   dom.imagePreview.classList.remove('hidden');
-  dom.uploadArea.style.display = 'none';
+  dom.uploadActions.style.display = 'none';
   dom.hashValue.textContent = imageData.hash;
 }

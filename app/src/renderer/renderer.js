@@ -3,11 +3,13 @@ import { initImageSelection, updateTimestampDisplay } from './features/imageSele
 import { initSubmit } from './features/submit.js';
 import { initRecords, loadRecords } from './features/records.js';
 import { initSettings } from './features/settings.js';
+import { initVerify } from './features/verify.js';
 
 initTabs({ onRecordsTab: loadRecords });
 initImageSelection();
 initSubmit();
 initRecords();
 initSettings();
+initVerify();
 updateTimestampDisplay();
 setInterval(updateTimestampDisplay, 1000);

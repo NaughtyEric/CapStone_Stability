@@ -13,5 +13,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   updateTransactionId: (data) => ipcRenderer.invoke('update-transaction-id', data),
 
   // Blockchain submission
-  submitToChain: (data) => ipcRenderer.invoke('submit-to-chain', data)
+  submitToChain: (data) => ipcRenderer.invoke('submit-to-chain', data),
+  verifyOnChain: (data) => ipcRenderer.invoke('verify-on-chain', data)
 });

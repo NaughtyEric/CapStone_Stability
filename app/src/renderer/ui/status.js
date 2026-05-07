@@ -1,4 +1,4 @@
-export function showStatus(element, type, message) {
+export function showStatus(element, type, message, timeout = 5000) {
   element.className = `status-message ${type}`;
   element.textContent = message;
   element.classList.remove('hidden');
@@ -6,7 +6,7 @@ export function showStatus(element, type, message) {
   if (type === 'success' || type === 'info') {
     setTimeout(() => {
       element.classList.add('hidden');
-    }, 5000);
+    }, timeout);
   }
 }
 
