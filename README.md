@@ -94,7 +94,14 @@ Note: Outdated. Please refer to the actual project structure in the repository f
 ### Building
 
 ```bash
-# Build for Windows
+# From the app/ folder
+cd app
+npm install
+
+# Debug/run the Electron app
+npm run start
+
+# Build a Windows .exe installer (NSIS)
 npm run build:win
 
 # Build for MacOS
@@ -103,6 +110,8 @@ npm run build:mac
 # Build for all platforms
 npm run build
 ```
+
+After `npm run build:win`, the Windows installer will be created under `app/dist/` (an `.exe` file). You can run that installer to get a runnable `.exe` application.
 
 
 ## Current Progress

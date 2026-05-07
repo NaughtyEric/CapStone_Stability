@@ -17,6 +17,7 @@ const submissionStatus = document.getElementById('submission-status');
 const recordsList = document.getElementById('records-list');
 const recordCount = document.getElementById('record-count');
 const refreshRecordsBtn = document.getElementById('refresh-records');
+const recordsStatus = document.getElementById('records-status');
 const rpcUrl = document.getElementById('rpc-url');
 const networkName = document.getElementById('network-name');
 const chainId = document.getElementById('chain-id');
@@ -29,6 +30,7 @@ const saveAbiBtn = document.getElementById('save-abi');
 // State
 let currentImage = null;
 let settings = loadSettings();
+let recordsCache = [];
 
 // Tab Navigation
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -156,8 +158,12 @@ submitBtn.addEventListener('click', async () => {
     showStatus(submissionStatus, 'info', '⏳ Submitting to blockchain...');
 
     try {
-        // Simulate blockchain transaction (in real implementation, use Web3)
-        const transactionId = await submitToBlockchain(currentImage.hash, metadataInput.value, signer || wallet);
+        const transactionId = await submitToBlockchain({
+            hash: currentImage.hash,
+            metadata: metadataInput.value,
+            signerAddress: signer || wallet,
+            timestamp: Math.floor(Date.now() / 1000)
+        });
 
         // Save to local storage
         const result = await window.electronAPI.submitEvidence({
@@ -213,9 +219,10 @@ saveLocalBtn.addEventListener('click', async () => {
 });
 
 // Web3 implementation
-async function submitToBlockchain(hash, metadata, signerAddress) {
+async function submitToBlockchain({ hash, metadata, signerAddress, timestamp }) {
     const rpc = rpcUrl.value.trim();
     const contract = contractAddress.value.trim();
+    const wallet = walletAddress.value.trim();
     const key = privateKey.value.trim();
     const abiText = contractAbi.value.trim();
 
@@ -224,6 +231,9 @@ async function submitToBlockchain(hash, metadata, signerAddress) {
     }
     if (!contract) {
         throw new Error('Contract address is empty');
+    }
+    if (!wallet) {
+        throw new Error('Wallet address is empty');
     }
     if (!key) {
         throw new Error('Private key is empty');
@@ -239,16 +249,21 @@ async function submitToBlockchain(hash, metadata, signerAddress) {
         throw new Error('Invalid ABI JSON');
     }
 
+    const submitTimestamp = Number.isFinite(Number(timestamp))
+        ? Math.floor(Number(timestamp))
+        : Math.floor(Date.now() / 1000);
+
     const result = await window.electronAPI.submitToChain({
         rpcUrl: rpc,
         chainId: parseInt(chainId.value, 10) || undefined,
         contractAddress: contract,
         contractAbi: parsedAbi,
+        walletAddress: wallet,
         privateKey: key,
         signerAddress,
         hash,
         metadata,
-        timestamp: Math.floor(Date.now() / 1000)
+        timestamp: submitTimestamp
     });
 
     if (!result.success) {
@@ -273,10 +288,12 @@ function resetForm() {
 async function loadRecords() {
     try {
         const records = await window.electronAPI.getRecords();
+        recordsCache = Array.isArray(records) ? records : [];
         displayRecords(records);
     } catch (error) {
         console.error('Error loading records:', error);
         recordsList.innerHTML = '<p class="no-records">Error loading records</p>';
+        recordsCache = [];
     }
 }
 
@@ -360,8 +377,43 @@ function attachRecordEventListeners() {
     document.querySelectorAll('.submit-pending').forEach(btn => {
         btn.addEventListener('click', async () => {
             const recordId = btn.dataset.id;
-            // Switch to submit tab and populate with record data
-            alert('Please configure blockchain settings in the Submit tab and submit the record from there.');
+            const record = recordsCache.find(item => item.id === recordId);
+
+            if (!record) {
+                showStatus(recordsStatus, 'error', 'Record not found. Please refresh.');
+                return;
+            }
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Submitting...';
+            showStatus(recordsStatus, 'info', 'Submitting record to blockchain...');
+
+            try {
+                const txHash = await submitToBlockchain({
+                    hash: record.hash,
+                    metadata: record.metadata || '',
+                    signerAddress: signAddress ? signAddress.value.trim() : '',
+                    timestamp: parseTimestampToUnix(record.timestamp)
+                });
+
+                const updateResult = await window.electronAPI.updateTransactionId({
+                    recordId,
+                    transactionId: txHash
+                });
+
+                if (!updateResult.success) {
+                    throw new Error(updateResult.error || 'Failed to update record');
+                }
+
+                showStatus(recordsStatus, 'success', `Submitted to blockchain. Transaction ID: ${txHash}`);
+                await loadRecords();
+            } catch (error) {
+                showStatus(recordsStatus, 'error', 'Blockchain submission failed: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
         });
     });
 }
@@ -498,6 +550,15 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function parseTimestampToUnix(timestamp) {
+    if (!timestamp) {
+        return undefined;
+    }
+
+    const parsed = Date.parse(timestamp);
+    return Number.isNaN(parsed) ? undefined : Math.floor(parsed / 1000);
 }
 
 // Initialize

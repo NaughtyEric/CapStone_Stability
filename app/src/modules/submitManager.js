@@ -24,6 +24,14 @@ function normalizeHash(hash) {
 	return normalized;
 }
 
+function normalizeAddress(address) {
+	return address ? address.trim() : '';
+}
+
+function isValidAddress(address) {
+	return /^0x[0-9a-fA-F]{40}$/.test(address);
+}
+
 function getSubmitMethod(contract) {
 	const candidates = contract.options.jsonInterface.filter(item => {
 		return item.type === 'function' && item.name === 'submitEvidence';
@@ -51,6 +59,7 @@ async function submitEvidenceOnChain({
 	chainId,
 	contractAddress,
 	contractAbi,
+	walletAddress,
 	privateKey,
 	hash,
 	metadata,
@@ -66,6 +75,11 @@ async function submitEvidenceOnChain({
 	const normalizedKey = normalizePrivateKey(privateKey);
 	if (!isValidPrivateKey(normalizedKey)) {
 		throw new Error('Invalid private key');
+	}
+
+	const normalizedWallet = normalizeAddress(walletAddress);
+	if (normalizedWallet && !isValidAddress(normalizedWallet)) {
+		throw new Error('Invalid wallet address');
 	}
 
 	const normalizedHash = normalizeHash(hash);
@@ -93,6 +107,10 @@ async function submitEvidenceOnChain({
 	const account = web3.eth.accounts.privateKeyToAccount(normalizedKey);
 	web3.eth.accounts.wallet.add(account);
 	web3.eth.defaultAccount = account.address;
+
+	if (normalizedWallet && normalizedWallet.toLowerCase() !== account.address.toLowerCase()) {
+		throw new Error('Wallet address does not match private key');
+	}
 
 	const contract = new web3.eth.Contract(parsedAbi, contractAddress);
 	const submitMethod = getSubmitMethod(contract);
