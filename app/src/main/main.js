@@ -1,8 +1,21 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const { registerIpcHandlers } = require('./ipc/registerIpcHandlers');
 const { createMainWindow } = require('./windows/createMainWindow');
 
 function bootApplication() {
+  if (process.platform === 'darwin') {
+    const menu = Menu.buildFromTemplate([
+      {
+        label: app.name,
+        submenu: [
+          { role: 'quit', label: 'Exit' }
+        ]
+      }
+    ]);
+    Menu.setApplicationMenu(menu);
+  } else {
+    Menu.setApplicationMenu(null);
+  }
   registerIpcHandlers();
   createMainWindow();
 

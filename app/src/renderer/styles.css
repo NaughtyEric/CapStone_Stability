@@ -71,14 +71,88 @@ header h1 {
 /* Tab Content */
 .tab-content {
   display: none;
+  opacity: 0;
+  transform: translateX(0);
+}
+
+.tab-content.active,
+.tab-content.tab-slide-in,
+.tab-content.tab-slide-out {
+  display: block;
 }
 
 .tab-content.active {
-  display: block;
+  opacity: 1;
+}
+
+.tab-content.tab-slide-in.from-right {
+  animation: tab-slide-in-right 180ms ease-out;
+  opacity: 1;
+}
+
+.tab-content.tab-slide-in.from-left {
+  animation: tab-slide-in-left 180ms ease-out;
+  opacity: 1;
+}
+
+.tab-content.tab-slide-out.to-left {
+  animation: tab-slide-out-left 160ms ease-in;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.tab-content.tab-slide-out.to-right {
+  animation: tab-slide-out-right 160ms ease-in;
+  opacity: 1;
+  pointer-events: none;
 }
 
 .hidden {
   display: none !important;
+}
+
+@keyframes tab-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tab-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tab-slide-out-left {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+}
+
+@keyframes tab-slide-out-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(18px);
+  }
 }
 
 /* Cards */
