@@ -1,6 +1,7 @@
 export const dom = {
   uploadArea: document.getElementById('upload-area'),
   uploadActions: document.getElementById('upload-actions'),
+  screenshotBtn: document.getElementById('screenshot-btn'),
   imagePreview: document.getElementById('image-preview'),
   previewImg: document.getElementById('preview-img'),
   clearImageBtn: document.getElementById('clear-image'),

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+  <title>Select Screenshot Area</title>
+  <link rel="stylesheet" href="selection.css">
+</head>
+<body>
+  <div id="screen-root">
+    <img id="screen-image" alt="Screenshot background">
+    <div id="selection-rect" class="hidden"></div>
+    <div id="selection-hint">Drag to select. Press Esc to cancel.</div>
+  </div>
+  <script src="selection.js"></script>
+</body>
+</html>

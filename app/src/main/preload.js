@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   // Image selection and hashing
   selectImage: () => ipcRenderer.invoke('select-image'),
+  takeScreenshot: () => ipcRenderer.invoke('take-screenshot'),
   
   // Evidence submission
   submitEvidence: (data) => ipcRenderer.invoke('submit-evidence', data),

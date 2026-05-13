@@ -10,14 +10,22 @@ function loadSettings() {
       rpcUrl: '',
       networkName: 'mainnet',
       chainId: 1,
-      contractAbi: ''
+      contractAbi: '',
+      contractAddress: '',
+      walletAddress: '',
+      signAddress: '',
+      privateKey: ''
     };
   } catch (error) {
     return {
       rpcUrl: '',
       networkName: 'mainnet',
       chainId: 1,
-      contractAbi: ''
+      contractAbi: '',
+      contractAddress: '',
+      walletAddress: '',
+      signAddress: '',
+      privateKey: ''
     };
   }
 }
@@ -27,7 +35,11 @@ function saveSettings() {
     rpcUrl: dom.rpcUrl.value,
     networkName: dom.networkName.value,
     chainId: parseInt(dom.chainId.value, 10) || 1,
-    contractAbi: dom.contractAbi.value
+    contractAbi: dom.contractAbi.value,
+    contractAddress: dom.contractAddress.value,
+    walletAddress: dom.walletAddress.value,
+    signAddress: dom.signAddress.value,
+    privateKey: dom.privateKey.value
   };
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
@@ -38,6 +50,10 @@ export function initSettings() {
   dom.networkName.value = settings.networkName || 'mainnet';
   dom.chainId.value = settings.chainId || 1;
   dom.contractAbi.value = settings.contractAbi || '';
+  dom.contractAddress.value = settings.contractAddress || '';
+  dom.walletAddress.value = settings.walletAddress || '';
+  dom.signAddress.value = settings.signAddress || '';
+  dom.privateKey.value = settings.privateKey || '';
 
   dom.saveSettingsBtn.addEventListener('click', () => {
     saveSettings();

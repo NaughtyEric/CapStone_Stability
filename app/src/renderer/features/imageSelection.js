@@ -20,6 +20,24 @@ export function initImageSelection() {
     }
   });
 
+  if (dom.screenshotBtn) {
+    dom.screenshotBtn.addEventListener('click', async () => {
+      try {
+        const result = await window.electronAPI.takeScreenshot();
+
+        if (result) {
+          setCurrentImage(result);
+          displayImage(result);
+          updateTimestampDisplay();
+          enableButtons();
+        }
+      } catch (error) {
+        console.error('Error taking screenshot:', error);
+        showStatus(dom.submissionStatus, 'error', 'Failed to take screenshot: ' + error.message);
+      }
+    });
+  }
+
   dom.clearImageBtn.addEventListener('click', () => {
     setCurrentImage(null);
     dom.imagePreview.classList.add('hidden');

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { hashFile } = require('./hashService');
+const { hashFile, hashBuffer } = require('./hashService');
 
 async function buildImagePayload(filePath) {
   const hash = await hashFile(filePath);
@@ -16,6 +16,22 @@ async function buildImagePayload(filePath) {
   };
 }
 
+function buildImagePayloadFromBuffer(buffer, fileName, mimeType) {
+  const hash = hashBuffer(buffer);
+  const base64Image = buffer.toString('base64');
+  const ext = fileName ? path.extname(fileName).slice(1).toLowerCase() : 'png';
+  const resolvedName = fileName || `screenshot.${ext}`;
+  const resolvedMime = mimeType || `image/${ext}`;
+
+  return {
+    path: null,
+    hash,
+    base64: `data:${resolvedMime};base64,${base64Image}`,
+    fileName: resolvedName
+  };
+}
+
 module.exports = {
-  buildImagePayload
+  buildImagePayload,
+  buildImagePayloadFromBuffer
 };
