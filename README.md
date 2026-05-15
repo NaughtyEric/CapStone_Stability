@@ -25,13 +25,15 @@ Besides, the application should be a desktop app compatible with both Windows an
 
 - Solidity - Smart Contract Development
 - JavaScript - Application Logic
-- *Uncertain - UI Framework (e.g., Electron, React)*
+- Electron - Desktop Application
+- Web3.js - Blockchain Interaction
+- Hardhat - Smart Contract Tooling
 
 ### Workflow
 
 #### 1. Upload Image
 
-Click the upload area or drag and drop an image, and the SHA-256 hash will be automatically generated.
+Click the upload area or take a screenshot (full screen or selected region). The SHA-256 hash will be automatically generated.
 
 #### 2. Add Metadata (Optional)
 
@@ -46,7 +48,7 @@ They will all be encrypted and stored alongside the hash on the blockchain.
 
 #### 3. Submit to Blockchain
 
-After configure the blockchain settings (RPC URL, contract address, wallet address and private key), users can record the evidence on-chain simply in one click.
+After configuring the blockchain settings (RPC URL, contract address, wallet address, and private key), users can record the evidence on-chain in one click.
 
 Alternatively, click "Save Locally Only" to store the evidence without blockchain submission.
 
@@ -58,9 +60,13 @@ Switch to the "View Records" tab to:
 - Copy hashes for verification
 - Mark a record, e.g., "Reviewed", "Important", "Deprecated", etc.
 
+#### 5. Verify Evidence
+
+Open the "Verify Evidence" tab, re-upload an image, and check whether the hash exists on-chain without exposing the original image.
+
 ## Smart Contract
 
-The application is designed to work with the `EvidenceRegistry` smart contract. See `src/contracts/EvidenceRegistry.sol` for the contract source code.
+The application is designed to work with the `EvidenceRegistry` smart contract. See `chain/contracts/EvidenceRegistry.sol` for the contract source code.
 
 ### Contract Interface
 
@@ -70,24 +76,21 @@ function getEvidence(uint256 id) public view returns (bytes32 hash, uint256 time
 function verifyHash(bytes32 hash) public view returns (bool exists, uint256 evidenceId)
 ```
 
-## Project Structure (Current Design)
-
-Note: Outdated. Please refer to the actual project structure in the repository for the latest organization.
+## Project Structure
 
 ```
-├── src/
-│   ├── main/
-│   │   ├── main.js          # Electron main process
-│   │   └── preload.js       # Preload script for IPC
-│   ├── renderer/
-│   │   ├── index.html       # Main UI
-│   │   ├── styles.css       # Styling
-│   │   └── renderer.js      # Renderer process logic
-│   └── contracts/
-│       └── EvidenceRegistry.sol  # Smart contract
+├── app/
+│   ├── src/
+│   │   ├── main/            # Electron main process + IPC
+│   │   ├── renderer/        # UI + renderer logic
+│   │   └── modules/         # Shared app modules
+│   └── package.json
+├── chain/
+│   ├── contracts/           # Solidity contracts
+│   ├── ignition/            # Deployment modules
+│   └── hardhat.config.ts
 ├── __tests__/
-│   └── hash.test.js         # Unit tests
-├── package.json
+│   └── hash.test.js         # Test for hash generation, deprecated
 └── README.md
 ```
 
@@ -112,19 +115,3 @@ npm run build
 ```
 
 After `npm run build:win`, the Windows installer will be created under `app/dist/` (an `.exe` file). You can run that installer to get a runnable `.exe` application.
-
-
-## Current Progress
-
-- \[F\] Still in planning phase
-- \[D\] In development
-- \[C\] Completed but not yet tested
-- \[T\] Tested and verified 
-
-
-[C] Smart contract Implementation. \
-[T] Basic hash generation and image handling. \
-[D] Blockchain interaction and transaction submission.\
-[D] Desktop application UI design and implementation.\
-[F] History record viewing and management.\
-[F] Desktop packing and distribution.
