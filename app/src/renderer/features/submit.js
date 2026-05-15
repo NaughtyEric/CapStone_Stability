@@ -1,6 +1,6 @@
 import { dom } from '../ui/dom.js';
 import { state } from '../state.js';
-import { showStatus } from '../ui/status.js';
+import { showStatus, showToast } from '../ui/status.js';
 import { submitToBlockchain } from '../services/blockchain.js';
 import { resetForm } from './imageSelection.js';
 
@@ -22,7 +22,7 @@ export function initSubmit() {
     }
 
     dom.submitBtn.disabled = true;
-    showStatus(dom.submissionStatus, 'info', '⏳ Submitting to blockchain...');
+    showStatus(dom.submissionStatus, 'info', '⏳ Submitting to blockchain...', { autoHide: false });
 
     try {
       const transactionId = await submitToBlockchain({
@@ -45,9 +45,11 @@ export function initSubmit() {
         resetForm();
       } else {
         showStatus(dom.submissionStatus, 'error', '❌ Failed to save record: ' + result.error);
+        showToast('Submit failed: ' + result.error, 'error');
       }
     } catch (error) {
       showStatus(dom.submissionStatus, 'error', '❌ Blockchain submission failed: ' + error.message);
+      showToast('Submit failed: ' + error.message, 'error');
     } finally {
       dom.submitBtn.disabled = false;
     }
@@ -75,9 +77,11 @@ export function initSubmit() {
         resetForm();
       } else {
         showStatus(dom.submissionStatus, 'error', '❌ Failed to save record: ' + result.error);
+        showToast('Save failed: ' + result.error, 'error');
       }
     } catch (error) {
       showStatus(dom.submissionStatus, 'error', '❌ Failed to save: ' + error.message);
+      showToast('Save failed: ' + error.message, 'error');
     } finally {
       dom.saveLocalBtn.disabled = false;
     }
