@@ -11,6 +11,8 @@ body {
   background: transparent;
   color: #fff;
   font-family: "Segoe UI", Arial, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 #screen-root {
@@ -18,6 +20,8 @@ body {
   width: 100%;
   height: 100%;
   cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 #screen-image {
@@ -27,6 +31,8 @@ body {
   height: 100%;
   object-fit: fill;
   pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 #selection-rect {
@@ -34,6 +40,8 @@ body {
   border: 2px solid rgba(124, 58, 237, 0.95);
   background: rgba(124, 58, 237, 0.2);
   box-shadow: 0 0 0 9999px rgba(7, 10, 20, 0.45);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 #selection-rect.hidden {
@@ -50,4 +58,7 @@ body {
   border-radius: 999px;
   font-size: 0.9rem;
   letter-spacing: 0.2px;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }

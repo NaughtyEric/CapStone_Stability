@@ -71,6 +71,16 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     window.selectionAPI.cancelSelection();
   }
+
+  if (event.key === 'Enter') {
+    window.selectionAPI.completeSelection({
+      x: 0,
+      y: 0,
+      width: root.clientWidth,
+      height: root.clientHeight,
+      devicePixelRatio: window.devicePixelRatio
+    });
+  }
 });
 
 window.selectionAPI.onImage(({ dataUrl }) => {
