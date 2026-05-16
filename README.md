@@ -58,7 +58,6 @@ Switch to the "View Records" tab to:
 - Browse all submitted evidence
 - View hash, timestamp, and transaction details
 - Copy hashes for verification
-- Mark a record, e.g., "Reviewed", "Important", "Deprecated", etc.
 
 #### 5. Verify Evidence
 
